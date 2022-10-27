@@ -1,6 +1,6 @@
-import re
-import sqlite3 as sql
-from os.path import isfile
+import re 
+import sqlite3 as sql 
+from os.path import isfile 
 
 
 location_regex = [
@@ -64,7 +64,7 @@ def query_sql(key, value, columns, sql_file):
     return results
 
 
-def airbnb_bot(sql_file, top_n):
+def airbnb_bot(sql_file, top_n): 
     """
     find flats in a given location.
 
@@ -154,6 +154,20 @@ def airbnb_bot(sql_file, top_n):
             r[0], r[1], r[2]
         )
         print(answer)
+
+
+    sentence2 = input('\nMöchtest du 10 weitere Ergebnisse sehen?\n')
+    sentence2 = sentence2.lower()
+
+    if sentence2 == 'ja': # mehr antwortmöglichkeiten anbieten?
+        print('Hier sind die {} besten Ergebnisse:\n'.format(top_n))
+        for r in results[10:20]:
+            answer = '"{}", {}. Das Apartment kostet {}€.'.format(r[0], r[1], r[2])
+            # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
+            print(answer)
+    else:
+        print('Dann halt nicht.')
+        return
 
 
 if __name__ == '__main__':
