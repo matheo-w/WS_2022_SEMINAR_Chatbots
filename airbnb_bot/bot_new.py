@@ -48,7 +48,7 @@ def get_location_from_input(sentence, regex_list):
 #     for regex, value in regex_list
 
 
-def query_sql(key, value, columns, sql_file):
+def query_sql(location, max_price, min_nights, room_t, columns, sql_file):
     """
     Query a sqlite file for entries where "key" has the value "value".
     Return the values corresponding to columns as a list.
@@ -61,11 +61,11 @@ def query_sql(key, value, columns, sql_file):
 
     # prepare query string
     #query_template = 'SELECT {columns} FROM listings WHERE {key} = "{value}"'
-    query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = location AND price = max_price AND minimum_nights = min_nights AND room_type = room_t'
+    query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = {location} AND price = {max_price} AND minimum_nights = {min_nights} AND room_type = {room_t}'
 
     columns_string = ', '.join(columns)  # e.g. [location, price] -> 'location, price'
     # replace the curly brackets in query_template with the corresponding info
-    query = query_template.format(columns=columns_string, key=key, value=value)
+    query = query_template.format(columns=columns_string, location=location, max_price = max_price,min_nights=min_nights, room_t=room_t )
 
 
 
