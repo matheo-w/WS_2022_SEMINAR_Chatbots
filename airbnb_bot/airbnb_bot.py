@@ -51,7 +51,7 @@ def weiter_fragen(results,top_n):
             # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
             print(answer)
             
-# "Tiefergehende" Unterhaltung bzw. der Versuch es wie smalltalk wirken zu lassen 
+# "Tiefergehende" Unterhaltung bzw. der Versuch es wie smalltalk wirken zu lassen (Finn)
     sentence3 = input('\nWillst du einen Witz hören?\n')
     sentence3 = sentence3.lower()
     
@@ -70,6 +70,20 @@ def weiter_fragen(results,top_n):
     if sentence5 == 'super': # Hier wären vermutlich weitere Antwortmöglichkeiten ganz nützlich / funktionalität nicht sonderlich gut zum jetzigen Zeitpunkt
         print('\nDas freut mich zu hören! :)\n') #Der input vom Benutzer wird nicht akzeptiert wenn dieser länger ist als ein Wort, suche noch nach Lösungen dafür
      
+    sentence6 = input('\nWarst du eigentlich schon einmal in Berlin?\n')
+    sentence6 = sentence6.lower()
+    
+    if sentence6 == 'ja':
+        print('\nDann gehe ich mal davon aus, dass es dir dort gefallen hat :)\n')
+    if sentence6 == 'nein':
+        print('\nNa dann wird es ja mal allerhöchste Zeit das nachzuholen!\n')
+    
+    sentence7 = input('\nWillst du noch etwas wissen?\n') # Hier könnte man evtl nochmal auf das Dataset zugreifen 
+    sentence7 = sentence7.lower()
+    
+    if sentence7 == 'ja':
+        print('\nWas möchtest du wissen?\n') # Vielleicht kann man diese Stelle ja benutzen um das gespräch quasi neu zu starten
+
     
     else:
         print('Dann halt nicht')
