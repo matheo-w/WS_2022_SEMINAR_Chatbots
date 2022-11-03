@@ -50,6 +50,27 @@ def weiter_fragen(results,top_n):
             answer = '"{}", {}. Das Apartment kostet {}€.'.format(r[0], r[1], r[2])
             # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
             print(answer)
+            
+# "Tiefergehende" Unterhaltung bzw. der Versuch es wie smalltalk wirken zu lassen 
+    sentence3 = input('\nWillst du einen Witz hören?\n')
+    sentence3 = sentence3.lower()
+    
+    if sentence3 == 'ja':
+        print('\nWas ist gelb und kann nicht Schwimmen?                                                 Ein Bagger.\n')
+            
+    sentence4 = input('\nMöchtest du noch einen Witz hören?\n')
+    sentence4 = sentence4.lower()
+    
+    if sentence4 == 'ja':
+        print('\nWas ist rot und schlecht für die Zähne?                                                Ein Ziegelstein.\n')
+            
+    sentence5 = input('\nSpaß bei Seite, wie geht es dir denn überhaupt?\n')
+    sentence5 = sentence5.lower()
+    
+    if sentence5 == 'super': # Hier wären vermutlich weitere Antwortmöglichkeiten ganz nützlich / funktionalität nicht sonderlich gut zum jetzigen Zeitpunkt
+        print('\nDas freut mich zu hören! :)\n') #Der input vom Benutzer wird nicht akzeptiert wenn dieser länger ist als ein Wort, suche noch nach Lösungen dafür
+     
+    
     else:
         print('Dann halt nicht')
 
