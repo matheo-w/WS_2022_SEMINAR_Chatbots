@@ -25,9 +25,11 @@ location_regex = [
 room_regex = [
     (r'(haus)|(wohnung)|(apartment)','Entire home/apt'),
     (r'((privat)|(eigenes)|(zimmer))', 'Private Room'),
-    (r'(gruppen)|(gemeinsames)|(geteiltes)', 'Shared Room')
+    (r'(gruppen)|(gemeinsames)|(geteilte|s wohnung)', 'Shared Room')
 
 ]
+
+
 
 
 def get_location_from_input(sentence, regex_list):
@@ -47,8 +49,9 @@ def get_location_from_input(sentence, regex_list):
 
 #     for regex, value in regex_list
 
+#def query_sql(location, max_price, min_nights, room_t, columns, sql_file):
 
-def query_sql(location, max_price, min_nights, room_t, columns, sql_file):
+def query_sql(key, value, room_t, max_price, min_nights, columns, sql_file):
     """
     Query a sqlite file for entries where "key" has the value "value".
     Return the values corresponding to columns as a list.
@@ -60,12 +63,17 @@ def query_sql(location, max_price, min_nights, room_t, columns, sql_file):
 
 
     # prepare query string
-    #query_template = 'SELECT {columns} FROM listings WHERE {key} = "{value}"'
-    query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = {location} AND price = {max_price} AND minimum_nights = {min_nights} AND room_type = {room_t}'
+    query_template = 'SELECT {columns} FROM listings WHERE {key} = "{value}" AND room_type = "{room_t}" AND price <= {max_price} and minimum_nights <= {min_nights}'
+    #query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = "{location}" AND room_type = "{room_t}"'
+    #query_template = 'SELECT * from listings WHERE neighbourhood_group = {location} AND room_type = {room_t}'
+    #query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = {location} AND price = {max_price} AND minimum_nights = {min_nights} AND room_type = {room_t}'
+
 
     columns_string = ', '.join(columns)  # e.g. [location, price] -> 'location, price'
     # replace the curly brackets in query_template with the corresponding info
-    query = query_template.format(columns=columns_string, location=location, max_price = max_price,min_nights=min_nights, room_t=room_t )
+    query = query_template.format(columns=columns_string, key=key, value=value, room_t=room_t, max_price=max_price, min_nights=min_nights)
+    #query = query_template.format(columns=columns_string, neighbourhood_group=location, room_type=room_t )
+   # query = query_template.format(columns=columns_string, location=location, max_price = max_price,min_nights=min_nights, room_t=room_t )
 
 
 
@@ -113,7 +121,7 @@ def airbnb_bot(sql_file, top_n):
     print(', '.join(neighbourhoods))
 
     # get query from user
-    sentence = input('\nWo möchtest du denn übernachten?\n')
+    sentence = input('\nWo soll die Reise denn hingehen?\n')
     # normalize to lowercase
     sentence = sentence.lower()
 
@@ -127,10 +135,10 @@ def airbnb_bot(sql_file, top_n):
         sentence = input('\nWo möchtest du denn übernachten?\n')
         sentence = sentence.lower()
         location = get_location_from_input(sentence, regex_list=location_regex)
-    answer = 'Also dann in {}'.format(location)
+    answer = '\n {}? Da würde ich nicht bleiben wollen, aber okay... Ist ja dein Ausflug ne?\n'.format(location)
     print(answer)
 
-    sentence2 = input('\nWas für eine Unterkunft suchst du? Wir haben Häuser/Wohnungen,Einzelzimmer oder geteilte Zimmer zur verfügung.\n')
+    sentence2 = input('Was für eine Unterkunft suchst du? Wir haben Häuser/Wohnungen,Einzelzimmer oder geteilte Zimmer zur verfügung.\n')
     sentence2 = sentence2.lower()
     room_t = get_location_from_input(sentence2, regex_list=room_regex)
 
@@ -139,11 +147,48 @@ def airbnb_bot(sql_file, top_n):
         sentence2 = input('\nWas für eine Unterkunft suchst du? Wir haben Häuser/Wohnungen,Einzelzimmer oder geteilte Zimmer zur verfügung.\n')
         sentence2 = sentence2.lower()
         room_t = get_location_from_input(sentence2, regex_list=room_regex)
-    answer2 = 'Also dann ein {}'.format(room_t)
+    answer2 = '\n Also dann ein {} in {}... \n'.format(room_t, location)
     print(answer2)
 
+    price_input = input('Was würdest du denn ausgeben wollen?\n') #gibt man 3oo oder ähnliches ein kommt ein fehler. buchstaben direkt nach den zahlen sind gefährlich, weiß aber nicht warum. Das €-Zeichen direkt danach funktioniert aber
+    p = ''.join(price_input)
+    p_txt = re.findall(r'\b[0-9]+\b', p)
+    max_price = ''.join(p_txt)
 
 
+    if int(max_price) < 50:
+        answer3 = '\n Nur {}€?hast nicht so viele Moneten oder? Ich hoffe für dich es gibt auch günstige Angebote'.format(max_price)
+    else:
+        answer3 = '\n Dein Budget liegt also bei {}€. Interessant... Ich suche dir etwas aus das in dein Budget passt'.format(max_price)
+    print(answer3)
+
+
+  
+
+    nights_input = input('\nWie lange möchtest du bleiben? Bitte keine angaben in Wochen, ich bin schlecht im rechnen :(\n')
+    n = ''.join(nights_input)
+    n_txt = re.findall(r'\b[0-9]+\b', n)
+    min_nights = ''.join(n_txt)
+
+    if int(min_nights) <= 3:
+        answer4 = '\n Ein Wochenendausflug? Nett.\n'
+    if int(min_nights) >= 4:
+        answer4 = '\n {} Tage? Das sollte lang genug sein um sich alles anzuschauen!\n'.format(min_nights)
+    print(answer4)
+        
+
+
+    columns = ['name', 'neighbourhood', 'price', 'minimum_nights', 'room_type', 'neighbourhood_group']
+    results = query_sql(
+        key='neighbourhood_group', value=location, room_t=room_t, max_price=max_price, min_nights=min_nights,
+        columns=columns, sql_file=sql_file)
+
+    print('Ich habe {} passende {} in {} gefunden.\n'.format(
+                len(results),room_t ,location))
+
+    for r in results[:top_n]:
+        answer = '{},{} für {}€.{} {}\n'.format(r[4],r[5],r[2],r[3],r[0])
+        print(answer)
     
 
 
