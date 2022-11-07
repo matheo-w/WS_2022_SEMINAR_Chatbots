@@ -30,6 +30,11 @@ room_regex = [
 ]
 
 
+smalltalk_regex = [ #mehr Auswahl / füge das nur schonmal ein
+    (r'(gut)|(super)|(toll)|(ausgezeichnet)|(klasse)','Das freut mich!'),
+    (r'(schlecht)|(nicht gut)|(mies)','Oh schade'),
+    (r'(ganz ok)|(ganz)|(vernünftig)|(ok)','Das klingt nicht schlecht.'),
+]
 
 
 def get_location_from_input(sentence, regex_list):
@@ -190,6 +195,19 @@ def airbnb_bot(sql_file, top_n):
         answer = '{},{} für {}€.{} {}\n'.format(r[4],r[5],r[2],r[3],r[0])
         print(answer)
     
+##
+    sentence3 = input('\nWie geht es dir denn heute?\n')
+    sentence3 = sentence3.lower()
+    talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+    
+    while talk is None:
+        print('\nIch weiß leider nicht was du mir mitteilen möchtest, könntest du das noch einmal wiederholen?\n')
+        sentence3 = input('\nWie geht es dir denn heute?\n')
+        sentence3 = sentence3.lower()
+        talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+    answer3 = '{}\n'.format(talk) #### verbessern (läuft nicht so rund die Antwort)
+    print(answer3)
+
 
 
 
