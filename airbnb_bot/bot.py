@@ -49,7 +49,7 @@ smalltalk_regex = [
     (r'(4)|(vier)|(5)|(fünf)|(6)|(sechs)|(7)|(sieben)','Es könnte schlechter sein schätze ich :p'),
     (r'(8)|(acht)|(9)|(neun)|(zehn)', 'Na super, also kannst du mich ja mal auf deinem Ausflug empfehlen ^^'),  
     (r'(ja)','Donnerwetter du scheinst ja richtig engagiert zu sein!'),
-    (r'(nein)','Also falls du jetzt einen Wetterbericht erwartet hast muss ich dich leider enttäuschen. Glaube das Internet hilft dir bestimmt weiter...') #neuen regex für ja und nein 
+    (r'(nein)','Also falls du jetzt einen Wetterbericht erwartet hast muss ich dich leider enttäuschen. Glaube das Internet hilft dir bestimmt weiter...')  
 ]
 
 smalltalk_regex1 = [
