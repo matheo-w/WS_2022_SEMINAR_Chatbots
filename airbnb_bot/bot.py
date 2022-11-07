@@ -41,6 +41,32 @@ retry_regex = [
 ]
 
 
+smalltalk_regex = [ 
+    (r'(schlecht)|(nicht gut)|(mies)|(nicht so gut)','Oh schade'),
+    (r'(gut)|(super)|(toll)|(ausgezeichnet)|(klasse)','Das freut mich!'),
+    (r'(ganz ok)|(ganz)|(vernünftig)|(ok)','Das klingt nicht schlecht.'),
+    (r'(1)|(eins)|(2)|(zwei)|(3)|(drei)', 'Das tat ganz schön weh :,( du bist mir plötzlich nicht mehr so sympatisch...'),
+    (r'(4)|(vier)|(5)|(fünf)|(6)|(sechs)|(7)|(sieben)','Es könnte schlechter sein schätze ich :p'),
+    (r'(8)|(acht)|(9)|(neun)|(zehn)', 'Na super, also kannst du mich ja mal auf deinem Ausflug empfehlen ^^'),  
+    (r'(ja)','Donnerwetter du scheinst ja richtig engagiert zu sein!'),
+    (r'(nein)','Also falls du jetzt einen Wetterbericht erwartet hast muss ich dich leider enttäuschen. Glaube das Internet hilft dir bestimmt weiter...') #neuen regex für ja und nein 
+]
+
+smalltalk_regex1 = [
+    (r'(nein)|(ja)|(wusste)|(weiß)|(wissen)','Unfassbar oder!?'),
+]
+
+smalltalk_regex2 = [
+    (r'(ja)|(natürlich)|(mach)|(definitiv)|(natürlich)','Also wenn du noch ein bisschen Geld bei Seite legst kannst du dir für 8.000€ bis 20.000€ ein Museum in Berlin mieten und da zum Beispiel eine Party veranstalten :)'),
+    (r'(nein)|(nicht)|(wieso)|(warum)|(unwichtig)','Naja, also ich würde dir trotzdem empfehlen immer ein Ticket für die Bahn zu ziehen. Momentan sitzen nämlich etwa 1/3 der Strafgefangenen in Berlin wegen Schwarzfahren ein.')
+]
+
+smalltalk_regex3 = [
+    (r'(ja)|(klar)|(natürlich)|(absolut)|(definitiv)','In Berlin werden pro Jahr etwa 70 Millionen Currywürste verputzt, da solltest du bestimmt irgendwo fündig werden :)'),
+    (r'(nein)|(ekelhaft)|(nie)|(niemals)|(kein)|(keine)','Auch ok, in Berlin werden pro Tag rund 950 Dönerspieße verbraucht. Geht man davon aus, dass ein Spieß etwa 63 kg wiegt entspricht das knapp 60 Tonnen pro Tag! Ich gehe mal davon aus, dass du nicht verhungern wirst ^^')
+]
+
+
 
 
 def get_location_from_input(sentence, regex_list):
@@ -159,6 +185,19 @@ def airbnb_bot(sql_file, top_n):
         answer = '\n {}? Da würde ich nicht bleiben wollen, aber okay... Ist ja dein Ausflug ne?\n'.format(location)
         print(answer)
 #-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence3 = input('\nWie geht es dir denn überhaupt heute?\n')
+        sentence3 = sentence3.lower()
+        talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+    
+        while talk is None:
+            print('\nIch weiß leider nicht was du mir mitteilen möchtest, könntest du das noch einmal wiederholen?\n')
+            sentence3 = input('\nWie geht es dir denn heute?\n')
+            sentence3 = sentence3.lower()
+            talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+        answer3 = '{}\n'.format(talk) 
+        print(answer3)
+
 # Art der Unterkunft
 
         sentence2 = input('Was für eine Unterkunft suchst du? Ich kann nach Häusern bzw. Wohnungen, Einzelzimmern oder WG Zimmern suchen.\n')
@@ -202,6 +241,17 @@ def airbnb_bot(sql_file, top_n):
         print(answer3)
 
 #-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence4 = input('\nAuf einer Skala von 1 bis 9, wie würdest du unsere bisherige Unterhaltung bewerten?\n')
+        sentence4 = sentence4.lower()
+        talk1 = get_location_from_input(sentence4, regex_list=smalltalk_regex)
+
+        while talk1 is None:
+            print('\nPuh also ich weiß nicht was du da versuchst zu sagen aber OK. Vielleicht würdest du ja nochmal antworten?\n')
+            sentence4 = input('\nAuf einer Skala von 1 bis 9, wie würdest du unsere bisherige Unterhaltung bewerten?\n')
+            sentence4 = sentence4.lower()
+        answer4 = '{}\n'.format(talk1)
+        print(answer4)
 # Länge des Aufenthalts
     
         while nights_status == True:
@@ -226,6 +276,17 @@ def airbnb_bot(sql_file, top_n):
         print(answer4)
             
 #-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence5 = input('\nWeißt du eigentlich wie das Wetter auf deinem Ausflug wird? Also Ja oder Nein, bin nur neugierig ^^\n')
+        sentence5 = sentence5.lower()
+        talk2 = get_location_from_input(sentence5, regex_list=smalltalk_regex)
+
+        while talk2 is None:
+            print('\nHey also ich versuche nur hier irgendwie das Gespräch am laufen zu halten\n')
+            sentence5 = input('\nWeißt du eigentlich wie das Wetter auf deinem Ausflug wird?\n')
+            sentence5 = sentence5.lower()
+        answer5 = '{}\n'.format(talk2)
+        print(answer5)
 # Ergebnisse
 
         columns = ['name', 'neighbourhood', 'price', 'minimum_nights', 'room_type', 'neighbourhood_group', 'number_of_reviews','host_name']
@@ -233,6 +294,41 @@ def airbnb_bot(sql_file, top_n):
             key='neighbourhood_group', value=location, room_t=room_t, max_price=max_price, min_nights=min_nights,
             columns=columns, sql_file=sql_file)
 #-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence6 = input('\nWusstest du eigentlich, dass es in Berlin knapp 1600 Döner Läden gibt? Damit gibt es in Berlin mehr Läden als in Istanbul!\n')
+        sentence6 = sentence6.lower()
+        talk3 = get_location_from_input(sentence6, regex_list=smalltalk_regex1)
+
+        
+        while talk3 is None:
+            print('\nNaja irgendwie muss man das Gespräch hier ja am laufen halten\n')
+            sentence6 = input('\nWusstest du eigentlich, dass es in Berlin knapp 1600 Döner Läden gibt? Damit gibt es in Berlin mehr Läden als in Istanbul!\n')
+            sentence6 = sentence6.lower()
+        answer6 = '{}\n'.format(talk3)
+        print(answer6)
+
+        sentence7 = input('\nMöchtest du noch mehr unfassbar relevante Informationen zu Berlin hören? Also nicht dass du wirklich eine Wahl hättest.. :D\n')
+        sentence7 = sentence7.lower()
+        talk4 = get_location_from_input(sentence7, regex_list=smalltalk_regex2)
+
+        while talk4 is None:
+            print('\nSo kommen wir nicht weiter...\n')
+            sentence7 = input('\nMöchtest du noch mehr unfassbar relevante Informationen zu Berlin hören? Also nicht dass du wirklich eine Wahl hättest.. :D\n')
+            sentence7 = sentence7.lower()
+        answer7 = '{}\n'.format(talk4)
+        print(answer7)
+
+        sentence8 = input('\nMagst du eigentlich Currywurst?\n')       
+        sentence8 = sentence8.lower()
+        talk5 = get_location_from_input(sentence8, regex_list=smalltalk_regex3)
+
+        while talk5 is None:
+            print('\nAlso so schwer war die Frage ja nicht zu beantworten...\n')
+            sentence8 = input('\nMagst du eigentlich Currywurst?\n')
+            sentence8 = sentence8.lower()
+        answer8 = '{}\n'.format(talk5)
+        print(answer8)
+        
 # Falls nichts gefunden wurde, suche nochmal starten:
 
         print(' Ich habe {} passende {} in {} gefunden.'.format(
