@@ -1,6 +1,7 @@
-import re 
-import sqlite3 as sql 
-from os.path import isfile 
+import re
+import sqlite3 as sql
+from os.path import isfile
+
 
 
 location_regex = [
@@ -21,8 +22,54 @@ location_regex = [
     (r'(treptow)|(köpenick)', 'Treptow - Köpenick')
 ]
 
+room_regex = [
+    (r'(haus)|(wohnung)|(apartment)|(palast)|(flat)|(loft)','Entire home/apt'),
+    (r'(privat)|(eigenes)|(einzel)|(zimmer)|(room)', 'Private Room'),
+    (r'(gruppen)|(gemeinsames)|(geteilt)|(wg)|(wohngemeinschaft)|(gemeinschaft)|(shared)', 'Shared Room')
 
-def get_location_from_input(sentence, regex_list=location_regex):
+]
+
+filter_regex = [
+    (r'(teuer)|(absteigend)|(hoch)|(höchste)', 'dem höchsten Preis'),
+    (r'(günstig)|(billig)|(aufsteigend)|(niedrig)', 'dem niedrigsten Preis'),
+    (r'(bewertung)|(bewert)|(beste)|(meist)|(viel)', 'den meisten Bewertungen')
+]
+
+retry_regex = [
+    (r'(ja)|(yes)|(positiv)|(in der tat)|(auf jeden fall)|(bitte)', 'Ja'),
+    (r'(nein)|(no)|(negativ)|(niemals)|(auf keinen fall)|(nicht)|(lass mich)', 'Nein')
+]
+
+
+smalltalk_regex = [ 
+    (r'(schlecht)|(nicht gut)|(mies)|(nicht so gut)','Oh schade'),
+    (r'(gut)|(super)|(toll)|(ausgezeichnet)|(klasse)','Das freut mich!'),
+    (r'(ganz ok)|(ganz)|(vernünftig)|(ok)','Das klingt nicht schlecht.'),
+    (r'(1)|(eins)|(2)|(zwei)|(3)|(drei)', 'Das tat ganz schön weh :,( du bist mir plötzlich nicht mehr so sympatisch...'),
+    (r'(4)|(vier)|(5)|(fünf)|(6)|(sechs)|(7)|(sieben)','Es könnte schlechter sein schätze ich :p'),
+    (r'(8)|(acht)|(9)|(neun)|(zehn)', 'Na super, also kannst du mich ja mal auf deinem Ausflug empfehlen ^^'),  
+    (r'(ja)','Donnerwetter du scheinst ja richtig engagiert zu sein!'),
+    (r'(nein)','Also falls du jetzt einen Wetterbericht erwartet hast muss ich dich leider enttäuschen. Glaube das Internet hilft dir bestimmt weiter...')  
+]
+
+smalltalk_regex1 = [
+    (r'(nein)|(ja)|(wusste)|(weiß)|(wissen)|(cool)|(nice)|(wow)|(okay)|(aha)','Unfassbar oder!?'),
+]
+
+smalltalk_regex2 = [
+    (r'(ja)|(natürlich)|(mach)|(definitiv)|(natürlich)','Also wenn du noch ein bisschen Geld bei Seite legst kannst du dir für 8.000€ bis 20.000€ ein Museum in Berlin mieten und da zum Beispiel eine Party veranstalten :)'),
+    (r'(nein)|(nicht)|(wieso)|(warum)|(unwichtig)','Naja, also ich würde dir trotzdem empfehlen immer ein Ticket für die Bahn zu ziehen. Momentan sitzen nämlich etwa 1/3 der Strafgefangenen in Berlin wegen Schwarzfahren ein.')
+]
+
+smalltalk_regex3 = [
+    (r'(ja)|(klar)|(natürlich)|(absolut)|(definitiv)','In Berlin werden pro Jahr etwa 70 Millionen Currywürste verputzt, da solltest du bestimmt irgendwo fündig werden :)'),
+    (r'(nein)|(ekelhaft)|(nie)|(niemals)|(kein)|(keine)','Auch ok, in Berlin werden pro Tag rund 950 Dönerspieße verbraucht. Geht man davon aus, dass ein Spieß etwa 63 kg wiegt entspricht das knapp 60 Tonnen pro Tag! Ich gehe mal davon aus, dass du nicht verhungern wirst ^^')
+]
+
+
+
+
+def get_location_from_input(sentence, regex_list):
     """
     get valid location names from user input using RegEx
     """
@@ -35,63 +82,13 @@ def get_location_from_input(sentence, regex_list=location_regex):
     # return None if no regular expression matches the input
     return None
 
-# zwei neue Funktionen. Die weiter_fragen() hatten wir letzte Woche zusammen gemacht die andere wandelt den Input nur in einen Integer um
-def get_max_money_from_input(sentence):
-    number = int(sentence)
-    return number
+# def get_room_from_input(sentence, regex_list=room_regex):
 
-def weiter_fragen(results,top_n):
-    sentence2 = input('\nMöchtest du 10 weitere Ergebnisse sehen?\n')
-    sentence2 = sentence2.lower()
+#     for regex, value in regex_list
 
-    if sentence2 == 'ja': 
-        print('Alles klar, hier sind 10 weitere Ergebnisse:\n'.format(top_n))
-        for r in results[10:20]:
-            answer = '"{}", {}. Das Apartment kostet {}€.'.format(r[0], r[1], r[2])
-            # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
-            print(answer)
-            
-# "Tiefergehende" Unterhaltung bzw. der Versuch es wie smalltalk wirken zu lassen (Finn)
-    sentence3 = input('\nWillst du einen Witz hören?\n')
-    sentence3 = sentence3.lower()
-    
-    if sentence3 == 'ja':
-        print('\nWas ist gelb und kann nicht Schwimmen?                                                 Ein Bagger.\n')
-            
-    sentence4 = input('\nMöchtest du noch einen Witz hören?\n')
-    sentence4 = sentence4.lower()
-    
-    if sentence4 == 'ja':
-        print('\nWas ist rot und schlecht für die Zähne?                                                Ein Ziegelstein.\n')
-            
-    sentence5 = input('\nSpaß bei Seite, wie geht es dir denn überhaupt?\n')
-    sentence5 = sentence5.lower()
-    
-    if sentence5 == 'super': # Hier wären vermutlich weitere Antwortmöglichkeiten ganz nützlich / funktionalität nicht sonderlich gut zum jetzigen Zeitpunkt
-        print('\nDas freut mich zu hören! :)\n') #Der input vom Benutzer wird nicht akzeptiert wenn dieser länger ist als ein Wort, suche noch nach Lösungen dafür
-     
-    sentence6 = input('\nWarst du eigentlich schon einmal in Berlin?\n')
-    sentence6 = sentence6.lower()
-    
-    if sentence6 == 'ja':
-        print('\nDann gehe ich mal davon aus, dass es dir dort gefallen hat :)\n')
-    if sentence6 == 'nein':
-        print('\nNa dann wird es ja mal allerhöchste Zeit das nachzuholen!\n')
-    
-    sentence7 = input('\nWillst du noch etwas wissen?\n') # Hier könnte man evtl nochmal auf das Dataset zugreifen 
-    sentence7 = sentence7.lower()
-    
-    if sentence7 == 'ja':
-        print('\nWas möchtest du wissen?\n') # Vielleicht kann man diese Stelle ja benutzen um das gespräch quasi neu zu starten
+#def query_sql(location, max_price, min_nights, room_t, columns, sql_file):
 
-    
-    else:
-        print('Dann halt nicht')
-
-        return
-
-
-def query_sql(key, value, columns, sql_file):
+def query_sql(key, value, room_t, max_price, min_nights, columns, sql_file):
     """
     Query a sqlite file for entries where "key" has the value "value".
     Return the values corresponding to columns as a list.
@@ -103,12 +100,20 @@ def query_sql(key, value, columns, sql_file):
 
 
     # prepare query string
-    query_template = 'SELECT {columns} FROM listings WHERE {key} = "{value}"' #AND ...  
+    query_template = 'SELECT {columns} FROM listings WHERE {key} = "{value}" AND room_type = "{room_t}" AND price <= {max_price} and minimum_nights <= {min_nights}'
+    #query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = "{location}" AND room_type = "{room_t}"'
+    #query_template = 'SELECT * from listings WHERE neighbourhood_group = {location} AND room_type = {room_t}'
+    #query_template = 'SELECT {columns} FROM listings WHERE neighbourhood_group = {location} AND price = {max_price} AND minimum_nights = {min_nights} AND room_type = {room_t}'
+
+
     columns_string = ', '.join(columns)  # e.g. [location, price] -> 'location, price'
     # replace the curly brackets in query_template with the corresponding info
-    query = query_template.format(columns=columns_string, key=key, value=value)
+    query = query_template.format(columns=columns_string, key=key, value=value, room_t=room_t, max_price=max_price, min_nights=min_nights)
+    #query = query_template.format(columns=columns_string, neighbourhood_group=location, room_type=room_t )
+   # query = query_template.format(columns=columns_string, location=location, max_price = max_price,min_nights=min_nights, room_t=room_t )
 
-    
+
+
     # execute query
     r = c.execute(query)
     # get results as list
@@ -120,11 +125,9 @@ def query_sql(key, value, columns, sql_file):
     return results
 
 
-
-def airbnb_bot(sql_file, top_n): 
+def airbnb_bot(sql_file, top_n):
     """
     find flats in a given location.
-
     main steps:
     1) get input sentence from the user; normalize upper/lowercase
     2) extract the location name from the user input
@@ -151,227 +154,343 @@ def airbnb_bot(sql_file, top_n):
         'Lichtenberg', 'Marzahn - Hellersdorf', 'Mitte', 'Neukölln', 'Pankow',
         'Reinickendorf', 'Spandau', 'Steglitz - Zehlendorf',
         'Tempelhof - Schöneberg', 'Treptow - Köpenick']
-    print('Wir haben Appartements in folgenden Stadtteilen:')
-    print(', '.join(neighbourhoods)) # liste wird zu einem String gemacht
+    
+    
 
-    # get query from user / usereingabe wird als var gespeichert
+    active = True
+    filter_status = True
+    price_status = True
+    nights_status = True
+  
+    
+    # get query from user
+    while active == True:
 
-# Neuer Teil - Matheo 
-# 2 Auswahlmöglichkeiten/Kriterien um was geeignetes zu finden
-    q1 = input('\nMöchtest du nach Stadtteil oder Preis suchen?\n')
-    # normalize to lowercase / wird kleingeschrieben übernommen, da location_regex alles kleingeschrieben braucht (es müssen weniger Fälle bedacht werden)
-    q1 = q1.lower()
-
-
-
-    #####################################################################
-    # STEP 2: extract location information and check whether it's valid #
-    #####################################################################
-
-
-
-    # NLU -SPRACHVERSTEHEN 
-
-# Suche nach Stadtteil ist gleichgeblieben
-    if q1 == 'stadtteil':
-        # extract location from user input
-        sentence = input('\nWo möchtest du übernachten?\n')
+#-----------------------------------------------------------------------------------------------------------
+# Ortsabfrage
+        print('Wir haben Appartements in folgenden Stadtteilen:')
+        print(', '.join(neighbourhoods))
+        sentence = input('\nWo soll die Reise denn hingehen?\n')
+        # normalize to lowercase
         sentence = sentence.lower()
-        location = get_location_from_input(sentence)
 
-        while location is None: # aus der if-loop ist eine while-loop gemacht worden, damit die frage immer wieder gestellt wird,bis eine zufriedenstellende antwort gegeben wurde
+        # extract location from user input
+        location = get_location_from_input(sentence,regex_list=location_regex)
+
+        while location is None:
             # if the user input doesn't contain valid location information:
             # apologize & quit
             print('\nEntschuldigung, das habe ich leider nicht verstanden...')
             sentence = input('\nWo möchtest du denn übernachten?\n')
             sentence = sentence.lower()
-            location = get_location_from_input(sentence)
+            location = get_location_from_input(sentence, regex_list=location_regex)
+        answer = '\n {}? Da würde ich nicht bleiben wollen, aber okay... Ist ja dein Ausflug ne?\n'.format(location)
+        print(answer)
+#-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence3 = input('\nWie geht es dir denn überhaupt heute?\n')
+        sentence3 = sentence3.lower()
+        talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+    
+        while talk is None:
+            print('\nIch weiß leider nicht was du mir mitteilen möchtest, könntest du das noch einmal wiederholen?\n')
+            sentence3 = input('\nWie geht es dir denn heute?\n')
+            sentence3 = sentence3.lower()
+            talk = get_location_from_input(sentence3, regex_list=smalltalk_regex)
+        answer3 = '{}\n'.format(talk) 
+        print(answer3)
 
-            # get matches from csv file
-        columns = ['name', 'neighbourhood', 'price'] # versteh ich nicht
+# Art der Unterkunft
+
+        sentence2 = input('Was für eine Unterkunft suchst du? Ich kann nach Häusern bzw. Wohnungen, Einzelzimmern oder WG Zimmern suchen.\n')
+        sentence2 = sentence2.lower()
+        room_t = get_location_from_input(sentence2, regex_list=room_regex)
+
+        while room_t is None:
+            print('\nSorry, das habe ich leider nicht verstanden...')
+            sentence2 = input('\nWas für eine Unterkunft suchst du? Wir haben Häuser/Wohnungen,Einzelzimmer oder geteilte Zimmer zur verfügung.\n')
+            sentence2 = sentence2.lower()
+            room_t = get_location_from_input(sentence2, regex_list=room_regex)
+
+        if room_t == 'Entire home/apt':
+            print('\nHast wohl gern viel Platz? Vielleicht ist Berlin dann ehrlich gesagt nicht die beste Option für dich... Aber egal, machen wir weiter!')
+        if room_t == 'Private Room':
+            print('\nIst immer noch günstiger als ein Hotel, ne?')
+        if room_t == 'Shared Room':
+            print('\nMutige Entscheidung. Ich warne dich schonmal vor, davon werden garnicht so viele Angeboten!')
+
+#-----------------------------------------------------------------------------------------------------------
+# Frage nach dem Budget
+        while price_status == True:
+            price_input = input('\nWas würdest du denn ausgeben wollen?\n') #gibt man 3oo oder ähnliches ein kommt ein fehler. buchstaben direkt nach den zahlen sind gefährlich, weiß aber nicht warum. Das €-Zeichen direkt danach funktioniert aber
+            p = ''.join(price_input)
+            p_txt = re.findall(r'\b[0-9]+\b', p)
+            max_price = ''.join(p_txt)
+
+            try:
+                val = int(max_price)
+                price_status = False
+            except ValueError:
+                print('\nGibt dein Budget bitte als Zahl ein. Du darfst aber gern noch was nettes dazuschreiben ;)')
+                price_status = False
+                price_status = True
+
+
+        if int(max_price) < 25:
+            answer3 = '\n Nur {}€? Ich hoffe für dich es gibt auch günstige Angebote'.format(max_price)
+        else:
+            answer3 = '\n Dein Budget liegt also bei {}€. Interessant... Bist also kein Geringverdiener! Ich suche dir etwas aus das in dein Budget passt.'.format(max_price)
+        print(answer3)
+
+#-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence4 = input('\nAuf einer Skala von 1 bis 9, wie würdest du unsere bisherige Unterhaltung bewerten?\n')
+        sentence4 = sentence4.lower()
+        talk1 = get_location_from_input(sentence4, regex_list=smalltalk_regex)
+
+        while talk1 is None:
+            print('\nPuh also ich weiß nicht was du da versuchst zu sagen aber OK. Vielleicht würdest du ja nochmal antworten?\n')
+            sentence4 = input('\nAuf einer Skala von 1 bis 9, wie würdest du unsere bisherige Unterhaltung bewerten?\n')
+            sentence4 = sentence4.lower()
+            talk1 = get_location_from_input(sentence4, regex_list=smalltalk_regex)
+        answer4 = '{}\n'.format(talk1)
+        print(answer4)
+
+# Länge des Aufenthalts
+        while nights_status == True:
+            nights_input = input('\nWie lange möchtest du bleiben? Bitte keine Angaben in Wochen, ich bin schlecht im rechnen :(\n')
+            n = ''.join(nights_input)
+            n_txt = re.findall(r'\b[0-9]+\b', n)
+            min_nights = ''.join(n_txt)
+
+            try:
+                val = int(min_nights)
+                nights_status = False
+            except ValueError:
+                print('\nGib die länge deines Aufenthalts bitte als ganze Zahl ein :(')
+                nights_status = False
+                nights_status = True
+
+
+        if int(min_nights) <= 3:
+            answer4 = '\n Ein Wochenendausflug? Nett.\n'
+        if int(min_nights) >= 4:
+            answer4 = '\n {} Tage? Das sollte lang genug sein um sich alles anzuschauen!\n'.format(min_nights)
+        print(answer4)
+            
+#-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence5 = input('\nWeißt du eigentlich wie das Wetter auf deinem Ausflug wird? Also Ja oder Nein, bin nur neugierig ^^\n')
+        sentence5 = sentence5.lower()
+        talk2 = get_location_from_input(sentence5, regex_list=smalltalk_regex)
+
+        while talk2 is None:
+            print('\nHey also ich versuche nur hier irgendwie das Gespräch am laufen zu halten\n')
+            sentence5 = input('\nWeißt du eigentlich wie das Wetter auf deinem Ausflug wird?\n')
+            sentence5 = sentence5.lower()
+            talk2 = get_location_from_input(sentence5, regex_list=smalltalk_regex)
+        answer5 = '{}\n'.format(talk2)
+        print(answer5)
+# Ergebnisse
+
+        columns = ['name', 'neighbourhood', 'price', 'minimum_nights', 'room_type', 'neighbourhood_group', 'number_of_reviews','host_name']
         results = query_sql(
-                key='neighbourhood_group', value=location, # es wird in neighbourhood_group nach der location gesucht
-                columns=columns, sql_file=sql_file
-        )
+            key='neighbourhood_group', value=location, room_t=room_t, max_price=max_price, min_nights=min_nights,
+            columns=columns, sql_file=sql_file)
+#-----------------------------------------------------------------------------------------------------------
+### smalltalk
+        sentence6 = input('\nWusstest du eigentlich, dass es in Berlin knapp 1600 Döner Läden gibt? Damit gibt es in Berlin mehr Läden als in Istanbul!\n')
+        sentence6 = sentence6.lower()
+        talk3 = get_location_from_input(sentence6, regex_list=smalltalk_regex1)
 
-        # if there are no results: apologize & quit
+        
+        while talk3 is None:
+            print('\nNaja irgendwie muss man das Gespräch hier ja am laufen halten\n')
+            sentence6 = input('\nWusstest du eigentlich, dass es in Berlin knapp 1600 Döner Läden gibt? Damit gibt es in Berlin mehr Läden als in Istanbul!\n')
+            sentence6 = sentence6.lower()
+            talk3 = get_location_from_input(sentence6, regex_list=smalltalk_regex1)
+        answer6 = '{}\n'.format(talk3)
+        print(answer6)
+
+        sentence7 = input('\nMöchtest du noch mehr unfassbar relevante Informationen zu Berlin hören? Also nicht dass du wirklich eine Wahl hättest.. :D\n')
+        sentence7 = sentence7.lower()
+        talk4 = get_location_from_input(sentence7, regex_list=smalltalk_regex2)
+
+        while talk4 is None:
+            print('\nSo kommen wir nicht weiter...\n')
+            sentence7 = input('\nMöchtest du noch mehr unfassbar relevante Informationen zu Berlin hören? Also nicht dass du wirklich eine Wahl hättest.. :D\n')
+            sentence7 = sentence7.lower()
+            talk4 = get_location_from_input(sentence7, regex_list=smalltalk_regex2)
+        answer7 = '{}\n'.format(talk4)
+        print(answer7)
+
+        sentence8 = input('\nMagst du eigentlich Currywurst?\n')       
+        sentence8 = sentence8.lower()
+        talk5 = get_location_from_input(sentence8, regex_list=smalltalk_regex3)
+
+        while talk5 is None:
+            print('\nAlso so schwer war die Frage ja nicht zu beantworten...\n')
+            sentence8 = input('\nMagst du eigentlich Currywurst?\n')
+            sentence8 = sentence8.lower()
+            talk5 = get_location_from_input(sentence8, regex_list=smalltalk_regex3)
+        answer8 = '{}\n'.format(talk5)
+        print(answer8)
+        
+# Falls nichts gefunden wurde, suche nochmal starten:
+
+        print(' Aber nun zurück zu deiner Suche! Ich habe {} passende {} in {} gefunden.'.format(
+                    len(results),room_t ,location))
         if len(results) == 0:
-            print('Tut mir Leid, ich konnte leider nichts finden!')
-            return
+            print('\n Sieht so aus als könnte ich dir nichts anbieten... Vielleicht klappts ja in einem anderen Stadtteil?')
+            active = False
+            retry = input('\nMöchtest du nochmal eine neue Suche starten?\n')
+            retry = retry.lower()
+            retry_a = get_location_from_input(retry, regex_list=retry_regex)
+            while retry_a is None:
+                print(' Es gibt nur diese zwei Möglichkeiten!')
+                retry = input('\nMöchtest du nochmal eine neue Suche starten?\n')
+                retry = retry.lower()
+            retry_a = get_location_from_input(retry, regex_list=retry_regex)
+            if retry_a == 'Ja':
+                active = True
+                nights_status = True
+                price_status = True
+            else:
+                print('\n Sorry dass ich dir nicht helfen konnte, kannst ja zur Not im Auto schlafen!\n')
+            
+#-----------------------------------------------------------------------------------------------------------
+# Wenn Ergbnisse da sind, können diese unterschiedlich gefiltert ausgegeben werden:
+        else:
+            filter_status = True
+            while filter_status == True:
+                filter_q = input('\nMöchtest du die günstigsten, teuersten oder am häufigsten bewertesten Ergebnisse sehen?\n')
+                filter_q = filter_q.lower()
+                filter_a = get_location_from_input(filter_q, regex_list=filter_regex)
 
-        print('Ich habe {} passende Wohnungen in {} gefunden.\n'.format(
-        len(results), location))
-        print('Hier sind die {} besten Ergebnisse:\n'.format(top_n))
+                while filter_a is None:
+                    print('\nSorry, das hab ich nicht ganz verstanden, versuchen wir es nochmal')
+                    filter_q = input('\nMöchtest du die günstigsten, teuersten oder am häufigsten bewertesten Ergebnisse sehen?\n')
+                    filter_q = filter_q.lower()
+                    filter_a = get_location_from_input(filter_q, regex_list=filter_regex)
+                
+                for r in results[:top_n]:
+                    answer_filter='\n Hier sind die top {} Ergebnisse mit {} für {} in {}:\n'.format(top_n,filter_a, r[4], r[5])
+                print(answer_filter)
 
+#-----------------------------------------------------------------------------------------------------------
+                if filter_a == 'den meisten Bewertungen':
+                
+                    results.sort(reverse= True, key=lambda y: y[6])
 
-    # print the first top_n entries from the results list
-        for r in results[:top_n]: # für jeden der top 10 Einträge wird der Satz geprinted und mit name, neighbourhood und price gefüllt
-            answer = '"{}", {}. Das Apartment kostet {}€.'.format(
-                # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
-                r[0], r[1], r[2] 
-            )
-            print(answer)
-        weiter_fragen(results,top_n) # hier wird gefragt, ob 10 weitere ergebnisse gezeigt werden sollen
+                    for r in results[:top_n]:
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        print(answer)
+                        active = False
+                        filter_status = False
+                    restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                    restart_filter = restart_filter.lower()
+                    r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
 
+                    while r_filter is None:
+                        print('\nDrück dich bitte klarer aus! Ja oder nein?')
+                        restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                        restart_filter = restart_filter.lower()
+                        r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
+                    if r_filter == 'Ja':
+                        filter_status = True
+                    if r_filter == 'Nein':
+                        retry = input('\nMöchtest du nochmal eine neue Suche starten?\n')
+                        retry = retry.lower()
+                        retry_a = get_location_from_input(retry, regex_list=retry_regex)
 
-# hier wird nach einem Budget gefragt, es werden nur Unterkünfte gezeigt, die für den angegebenen Betrag eingestellt wurden
-    elif q1 == 'preis':
-        q2 = input('\nWie groß ist dein Budget?\n')
-        max_money = get_max_money_from_input(q2)
+                        if retry_a == 'Ja':
+                            active = False
+                            active = True
+                            nights_status = True
+                            price_status = True
+                            filter_status = False
 
-        columns = ['name', 'neighbourhood', 'price','neighbourhood_group']
-        results = query_sql(
-                key='price', value=max_money, 
-                columns=columns, sql_file=sql_file)
-        print('Ich habe {} passende Wohnungen für genau {}€ gefunden.\n'.format(
-        len(results), max_money))
-        print('Hier sind die besten 10 Ergebnisse:')
+                        else:
+                            print('\nAlles klar, ich hoffe da war was für dich dabei! Gute Reise!')
+                            filter_status = False
 
-        while len(results) == 0:
-            print('Tut mir Leid, ich konnte leider nichts finden!')
-            qw = input('\nMöchtest du nach einer anderen Preisklasse suchen?\n')
-            if qw == 'ja':
-                q2 = input('\nWie groß ist dein Budget?\n')
-                max_money = get_max_money_from_input(q2)
-                columns = ['name', 'neighbourhood', 'price','neighbourhood_group'] 
-                results = query_sql(
-                key='price', value=max_money,
-                columns=columns, sql_file=sql_file)
-                print('Ich habe {} passende Wohnungen für genau {}€ gefunden.\n'.format(
-                len(results), max_money))
-                print('Hier sind die 10 besten Ergebnisse:')
+#-----------------------------------------------------------------------------------------------------------
+                if filter_a == 'dem höchsten Preis':
 
-            if qw == 'nein':
-                print('Dann kann ich dir auch nicht mehr helfen.')
-                return
+                    results.sort(reverse=True, key=lambda y: y[2])
 
+                    for r in results[:top_n]:
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        print(answer)
+                        active = False
+                        filter_status = False
+                    restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                    restart_filter = restart_filter.lower()
+                    r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
+                    while r_filter is None:
+                        print('\nDrück dich bitte klarer aus! Ja oder nein?')
+                        restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                        restart_filter = restart_filter.lower()
+                        r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
+                    if r_filter == 'Ja':
+                        filter_status = True
+                    if r_filter == 'Nein':
+                        retry = input('\nMöchtest du nochmal eine neue Suche starten?\n')
+                        retry = retry.lower()
+                        retry_a = get_location_from_input(retry, regex_list=retry_regex)
 
-        for r in results[:top_n]: # für jeden der top 10 Einträge wird der Satz geprinted und mit name, neighbourhood und price gefüllt
-            answer = '"{}", Im Stadtteil {}.'.format(
-                # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
-                r[0], r[3]
-            )
-            print(answer)
-        weiter_fragen(results,top_n)
+                        if retry_a == 'Ja':
+                            active = False
+                            active = True
+                            nights_status = True
+                            price_status = True
+                            filter_status = False
 
+                        else:
+                            print('\nAlles klar, ich hoffe da war was für dich dabei! Gute Reise!')
+                            filter_status = False
 
-# falls die erste Eingabe fehlerhaft war, wird nochmal gefragt. Eigentlich sollte dann immer wieder gefragt werden, aber ich weiß nicht wie
+#-----------------------------------------------------------------------------------------------------------
+                if filter_a == 'dem niedrigsten Preis':
 
-    if q1 != 'stadtteil' and q1 != 'preis': # while-loop, damit immer wieder nachgefragt werden kann?
-        print('Sorry, das steht nicht zur Auswahl. Du musst dich schon für eins entscheiden.')
-        q1 = input('\nAlso. Stadtteil oder Preis?\n')
-        q1 = q1.lower()
+                    results.sort(key=lambda y: y[2])
+                    for r in results[:top_n]:
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        print(answer)
+                        active = False
+                        filter_status = False
+                    restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                    restart_filter = restart_filter.lower()
+                    r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
+                    while r_filter is None:
+                        print('\nDrück dich bitte klarer aus! Ja oder nein?')
+                        restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
+                        restart_filter = restart_filter.lower()
+                        r_filter = get_location_from_input(restart_filter, regex_list=retry_regex)
+                    if r_filter == 'Ja':
+                        filter_status = True
+                    if r_filter == 'Nein':
+                        retry = input('\nMöchtest du nochmal eine neue Suche starten?\n')
+                        retry = retry.lower()
+                        retry_a = get_location_from_input(retry, regex_list=retry_regex)
 
-        
+                        if retry_a == 'Ja':
+                            active = False
+                            active = True
+                            nights_status = True
+                            price_status = True
+                            filter_status = False
 
-        if q1 == 'stadtteil':
-            # extract location from user input
-            sentence = input('\nWo möchtest du übernachten?\n')
-            sentence = sentence.lower()
-            location = get_location_from_input(sentence)
-
-            while location is None: # aus der if-loop ist eine while-loop gemacht worden, damit die frage immer wieder gestellt wird,bis eine zufriedenstellende antwort gegeben wurde
-                # if the user input doesn't contain valid location information:
-                # apologize & quit
-                print('\nEntschuldigung, das habe ich leider nicht verstanden...')
-                sentence = input('\nWo möchtest du denn übernachten?\n')
-                sentence = sentence.lower()
-                location = get_location_from_input(sentence)
-
-                # get matches from csv file
-            columns = ['name', 'neighbourhood', 'price'] # versteh ich nicht
-            results = query_sql(
-                    key='neighbourhood_group', value=location, # es wird in neighbourhood_group nach der location gesucht
-                    columns=columns, sql_file=sql_file
-            )
-
-            # if there are no results: apologize & quit
-            if len(results) == 0:
-                print('Tut mir Leid, ich konnte leider nichts finden!')
-                return
-
-            print('Ich habe {} passende Wohnungen in {} gefunden.\n'.format(
-            len(results), location))
-            print('Hier sind die {} besten Ergebnisse:\n'.format(top_n))
-
-
-        # print the first top_n entries from the results list
-            for r in results[:top_n]: # für jeden der top 10 Einträge wird der Satz geprinted und mit name, neighbourhood und price gefüllt
-                answer = '"{}", {}. Das Apartment kostet {}€.'.format(
-                    # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
-                    r[0], r[1], r[2] 
-                )
-                print(answer)
-            weiter_fragen(results,top_n)
-
-
-
-        elif q1 == 'preis':
-            q2 = input('\nWie groß ist dein Budget?\n')
-            max_money = get_max_money_from_input(q2)
-
-            columns = ['name', 'neighbourhood', 'price', 'neighbourhood_group']
-            results = query_sql(
-                    key='price', value=max_money, 
-                    columns=columns, sql_file=sql_file)
-            print('Ich habe {} passende Wohnungen für genau {}€ gefunden.\n'.format(
-            len(results), max_money))
-
-            while len(results) == 0:
-                print('Tut mir Leid, ich konnte leider nichts finden!')
-                qw = input('\nMöchtest du nach einer anderen Preisklasse suchen?\n')
-                if qw == 'ja':
-                    q2 = input('\nWie groß ist dein Budget?\n')
-                    max_money = get_max_money_from_input(q2)
-                    columns = ['name', 'neighbourhood', 'price', 'neighbourhood_group'] 
-                    results = query_sql(
-                    key='price', value=max_money,
-                    columns=columns, sql_file=sql_file)
-                    print('Ich habe {} passende Wohnungen für genau {}€ gefunden.\n'.format(
-                    len(results), max_money))
-
-                if qw == 'nein':
-                    print('Dann kann ich dir auch nicht mehr helfen.')
-                    return
-
-            for r in results[:top_n]: # für jeden der top 10 Einträge wird der Satz geprinted und mit name, neighbourhood und price gefüllt
-                answer = '"{}", {}.'.format(
-                    # look at the columns list to see what r[0], r[1], r[2] are referring to! r[0] = name / r[1] = neighborhood / r[2] = price
-                    r[0], r[3]
-                )
-                print(answer)
-            weiter_fragen(results,top_n)
-
-
-    # else:
-    #     print('Sorry, das steht nicht zur Auswahl. Du musst dich schon für eins entscheiden.')
-
-
-
-
-
-
-
-
-    #####################################################################
-    # STEP 3: query sqlite file for flats in the area given by the user #
-    #####################################################################
-
-
-
-
-    #############################################################################
-    # STEP 4: print information about the first top_n flats in the results list #
-    #############################################################################
-
-    # NLG- Sprachgenerierung
-
-    # return results
-
-        
+                        else:
+                            print('\nAlles klar, ich hoffe da war was für dich dabei! Gute Reise!')
+                            filter_status = False
+                
 
 
 if __name__ == '__main__':
     #  the airbnb_bot() function is called if the script is executed!
-    airbnb_bot(sql_file='listings.db', top_n=10) # argumente: angeben, welche sql datei verwendet werden soll, wie viele ergebnisse angezeigt werden sollen
+    airbnb_bot(sql_file='listings.db', top_n=10)
 
+
+# smalltalk des bots: finn
+# abfrage und ausgabe der informationen für die unterkünfte: matheo
