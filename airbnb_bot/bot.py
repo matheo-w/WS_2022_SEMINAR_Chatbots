@@ -53,7 +53,7 @@ smalltalk_regex = [
 ]
 
 smalltalk_regex1 = [
-    (r'(nein)|(ja)|(wusste)|(weiß)|(wissen)','Unfassbar oder!?'),
+    (r'(nein)|(ja)|(wusste)|(weiß)|(wissen)|(cool)|(nice)|(wow)|(okay)|(aha)','Unfassbar oder!?'),
 ]
 
 smalltalk_regex2 = [
@@ -154,8 +154,8 @@ def airbnb_bot(sql_file, top_n):
         'Lichtenberg', 'Marzahn - Hellersdorf', 'Mitte', 'Neukölln', 'Pankow',
         'Reinickendorf', 'Spandau', 'Steglitz - Zehlendorf',
         'Tempelhof - Schöneberg', 'Treptow - Köpenick']
-    print('Wir haben Appartements in folgenden Stadtteilen:')
-    print(', '.join(neighbourhoods))
+    
+    
 
     active = True
     filter_status = True
@@ -168,6 +168,8 @@ def airbnb_bot(sql_file, top_n):
 
 #-----------------------------------------------------------------------------------------------------------
 # Ortsabfrage
+        print('Wir haben Appartements in folgenden Stadtteilen:')
+        print(', '.join(neighbourhoods))
         sentence = input('\nWo soll die Reise denn hingehen?\n')
         # normalize to lowercase
         sentence = sentence.lower()
@@ -234,7 +236,7 @@ def airbnb_bot(sql_file, top_n):
                 price_status = True
 
 
-        if int(max_price) < 50:
+        if int(max_price) < 25:
             answer3 = '\n Nur {}€? Ich hoffe für dich es gibt auch günstige Angebote'.format(max_price)
         else:
             answer3 = '\n Dein Budget liegt also bei {}€. Interessant... Bist also kein Geringverdiener! Ich suche dir etwas aus das in dein Budget passt.'.format(max_price)
@@ -250,6 +252,7 @@ def airbnb_bot(sql_file, top_n):
             print('\nPuh also ich weiß nicht was du da versuchst zu sagen aber OK. Vielleicht würdest du ja nochmal antworten?\n')
             sentence4 = input('\nAuf einer Skala von 1 bis 9, wie würdest du unsere bisherige Unterhaltung bewerten?\n')
             sentence4 = sentence4.lower()
+            talk1 = get_location_from_input(sentence4, regex_list=smalltalk_regex)
         answer4 = '{}\n'.format(talk1)
         print(answer4)
 # Länge des Aufenthalts
@@ -285,6 +288,7 @@ def airbnb_bot(sql_file, top_n):
             print('\nHey also ich versuche nur hier irgendwie das Gespräch am laufen zu halten\n')
             sentence5 = input('\nWeißt du eigentlich wie das Wetter auf deinem Ausflug wird?\n')
             sentence5 = sentence5.lower()
+            talk2 = get_location_from_input(sentence5, regex_list=smalltalk_regex)
         answer5 = '{}\n'.format(talk2)
         print(answer5)
 # Ergebnisse
@@ -304,6 +308,7 @@ def airbnb_bot(sql_file, top_n):
             print('\nNaja irgendwie muss man das Gespräch hier ja am laufen halten\n')
             sentence6 = input('\nWusstest du eigentlich, dass es in Berlin knapp 1600 Döner Läden gibt? Damit gibt es in Berlin mehr Läden als in Istanbul!\n')
             sentence6 = sentence6.lower()
+            talk3 = get_location_from_input(sentence6, regex_list=smalltalk_regex1)
         answer6 = '{}\n'.format(talk3)
         print(answer6)
 
@@ -315,6 +320,7 @@ def airbnb_bot(sql_file, top_n):
             print('\nSo kommen wir nicht weiter...\n')
             sentence7 = input('\nMöchtest du noch mehr unfassbar relevante Informationen zu Berlin hören? Also nicht dass du wirklich eine Wahl hättest.. :D\n')
             sentence7 = sentence7.lower()
+            talk4 = get_location_from_input(sentence7, regex_list=smalltalk_regex2)
         answer7 = '{}\n'.format(talk4)
         print(answer7)
 
@@ -326,12 +332,13 @@ def airbnb_bot(sql_file, top_n):
             print('\nAlso so schwer war die Frage ja nicht zu beantworten...\n')
             sentence8 = input('\nMagst du eigentlich Currywurst?\n')
             sentence8 = sentence8.lower()
+            talk5 = get_location_from_input(sentence8, regex_list=smalltalk_regex3)
         answer8 = '{}\n'.format(talk5)
         print(answer8)
         
 # Falls nichts gefunden wurde, suche nochmal starten:
 
-        print(' Ich habe {} passende {} in {} gefunden.'.format(
+        print(' Aber nun zurück zu deiner Suche! Ich habe {} passende {} in {} gefunden.'.format(
                     len(results),room_t ,location))
         if len(results) == 0:
             print('\n Sieht so aus als könnte ich dir nichts anbieten... Vielleicht klappts ja in einem anderen Stadtteil?')
@@ -376,7 +383,8 @@ def airbnb_bot(sql_file, top_n):
                     results.sort(reverse= True, key=lambda y: y[6])
 
                     for r in results[:top_n]:
-                        answer = '"{}" wird angeboten von {}. Der Preis pro Nacht liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        print(answer)
                         active = False
                         filter_status = False
                     restart_filter = input('\nMöchtest du die Ergebnisse anders sotrieren?\n')
@@ -412,7 +420,7 @@ def airbnb_bot(sql_file, top_n):
                     results.sort(reverse=True, key=lambda y: y[2])
 
                     for r in results[:top_n]:
-                        answer = '"{}" wird angeboten von {}. Der Preis pro Nacht liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
                         print(answer)
                         active = False
                         filter_status = False
@@ -447,7 +455,7 @@ def airbnb_bot(sql_file, top_n):
 
                     results.sort(key=lambda y: y[2])
                     for r in results[:top_n]:
-                        answer = '"{}" wird angeboten von {}. Der Preis pro Nacht liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
+                        answer = '"{}" wird angeboten von {}. Der Preis liegt bei {}€. Es gibt insgesamt {} Reviews.\n'.format(r[0],r[7],r[2],r[6])
                         print(answer)
                         active = False
                         filter_status = False
@@ -477,49 +485,6 @@ def airbnb_bot(sql_file, top_n):
                             print('\nAlles klar, ich hoffe da war was für dich dabei! Gute Reise!')
                             filter_status = False
                 
-
-
-    
-
-
-
-  
-
-    #####################################################################
-    # STEP 3: query sqlite file for flats in the area given by the user #
-    #####################################################################
-
-    # get matches from csv file
-    # columns = ['name', 'neighbourhood', 'price']
-    # results = query_sql(
-    #         key='neighbourhood_group', value=location,
-    #         columns=columns, sql_file=sql_file
-    #     )
-
-    # # if there are no results: apologize & quit
-    # if len(results) == 0:
-    #     print('Tut mir Leid, ich konnte leider nichts finden!')
-    #     return
-
-
-    # #############################################################################
-    # # STEP 4: print information about the first top_n flats in the results list #
-    # #############################################################################
-
-    # # NLG- Sprachgenerierung
-
-    # # return results
-    # print('Ich habe {} passende Wohnungen in {} gefunden.\n'.format(
-    #     len(results), location))
-    # print('Hier sind die {} besten Ergebnisse:\n'.format(top_n))
-
-    # # print the first top_n entries from the results list
-    # for r in results[:top_n]:
-    #     answer = '"{}", {}. Das Apartment kostet {}€.'.format(
-    #         # look at the columns list to see what r[0], r[1], r[2] are referring to!
-    #         r[0], r[1], r[2]
-    #     )
-    #     print(answer)
 
 
 if __name__ == '__main__':
